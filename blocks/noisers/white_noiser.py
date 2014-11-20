@@ -3,9 +3,9 @@ import numpy as np
 from blocks.abstract_block import AbstractBlock
 
 
-class WhiteNoiser(AbstractBlock):
+class NoiseMaker(AbstractBlock):
     def __init__(self):
-        super(WhiteNoiser, self).__init__()
+        super(NoiseMaker, self).__init__()
         self._expected_snr = 20
         self._noise = None
 

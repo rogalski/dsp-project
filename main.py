@@ -1,76 +1,89 @@
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib
 
 import blocks
+
+import blocks.abstract_block
+import blocks.filters.lowpass
 import blocks.generators
 import blocks.modulators
 import blocks.noisers
 import blocks.system
+import plots
 import utils
 
 
-CARRIER_FREQ = 50e6
-MODULATING_FREQ = 1e6
-FREQ_DEVIATION = 45e6
-GENERATION_TIME = 4 / MODULATING_FREQ
-SAMPLING_FREQ = 64 * CARRIER_FREQ
+class InteractiveRunner(object):
+    # pylint: disable=too-few-public-methods
+    __INTERACTIVE__ = False
+    plotOutputDir = "output"
 
+    def __init__(self):
+        self._data_loader = utils.DataLoader()
+        self._system = None
 
-def make_signal_generator():
-    generator = blocks.generators.SawGenerator()
-    generator.set_frequency(utils.DataLoader().modulating_freq)
-    generator.set_generation_time(utils.DataLoader().generation_time)
-    return generator
+    def run(self):
+        self._set_up_packages()
+        self._load_data()
+        self._build_system()
+        self._system.simulate()
+        self._make_plots()
 
+    def _set_up_packages(self):
+        np.set_printoptions(threshold=np.inf)
+        matplotlib.rcParams['axes.formatter.use_mathtext'] = True
+        matplotlib.rcParams['axes.formatter.use_locale'] = True
+        os.makedirs(self.plotOutputDir, exist_ok=True)
 
-def make_fm_modulator():
-    modulator = blocks.modulators.FrequencyModulator()
-    modulator.set_frequency_deviation(utils.DataLoader().freq_deviation)
-    modulator.set_carrier_frequency(utils.DataLoader().carrier_freq)
-    return modulator
+    def _load_data(self):
+        if self.__INTERACTIVE__:
+            self._data_loader.load_via_stdin()
+        else:
+            self._data_loader.mock()
 
+    def _build_system(self):
+        self._system = blocks.system.System()
+        self._build_system_blocks()
+        self._system.set_sampling_frequency(self._data_loader.sampling_freq)
 
-def make_noiser():
-    noiser = blocks.noisers.WhiteNoiser()
-    noiser.set_expected_snr(30)
-    return noiser
+    def _build_system_blocks(self):
+        blocks_cascade = [self._make_generator(),
+                          self._make_modulator(),
+                          self._make_channel(),
+                          self._make_lpf()]
+        for block in blocks_cascade:
+            self._system.append_block(block)
+        self._system.GENERATOR = 0
+        self._system.MODULATOR = 1
+        self._system.CHANNEL = 2
+        self._system.LPF = 3
 
+    def _make_generator(self):
+        generator = blocks.generators.SineGenerator()
+        generator.set_frequency(self._data_loader.modulating_freq)
+        generator.set_generation_time(self._data_loader.generation_time)
+        return generator
 
-def make_system():
-    system = blocks.system.System()
-    system.append_block(make_signal_generator())
-    system.append_block(make_fm_modulator())
-    system.append_block(make_noiser())
-    system.set_sampling_frequency(SAMPLING_FREQ)
-    return system
+    def _make_modulator(self):
+        modulator = blocks.modulators.FrequencyModulator()
+        modulator.set_frequency_deviation(self._data_loader.freq_deviation)
+        modulator.set_carrier_frequency(self._data_loader.carrier_freq)
+        return modulator
 
+    def _make_channel(self):
+        noise_maker = blocks.noisers.NoiseMaker()
+        noise_maker.set_expected_snr(self._data_loader.expected_snr)
+        return noise_maker
 
-def main():
-    np.set_printoptions(threshold=np.inf)
-    utils.DataLoader().load_via_stdin()
-    system = make_system()
-    system.simulate()
+    def _make_lpf(self):
+        lpf = blocks.filters.lowpass.LowPassFilter()
+        return lpf
 
-    os.makedirs("output", exist_ok=True)
-
-    print(system)
-    for index, block in enumerate(system):
-        print("Processing block", index)
-        plt.figure(figsize=(50, 5))
-        plt.plot(system.get_timeline(), block.get_input(),
-                 system.get_timeline(), block.get_output())
-        plt.grid(True, 'both')
-        plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude [V]")
-        plt.title("Input and output of {0}".format(block))
-        plt.savefig("output/{}.png".format(index))
-        try:
-            print("SNR", block.get_snr())
-        except AttributeError:
-            pass
+    def _make_plots(self):
+        plots.SystemPlotMaker(self._system, self.plotOutputDir).make()
 
 
 if __name__ == "__main__":
-    main()
+    InteractiveRunner().run()

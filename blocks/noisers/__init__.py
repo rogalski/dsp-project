@@ -1,1 +1,1 @@
-from .white_noiser import WhiteNoiser
+from .white_noiser import NoiseMaker

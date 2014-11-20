@@ -16,6 +16,6 @@ pep8:
 	pep8 $(PYTHON_FILES)
 
 pylint:
-	pylint $(PYTHON_FILES) --disable=C,R
+	pylint $(PYTHON_FILES) --disable=C
 
 lint: pep8 pylint

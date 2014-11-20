@@ -46,3 +46,6 @@ class System(object):
         if not self._blocks:
             return None
         return self._blocks[0].get_input()
+
+    def get_block(self, pos):
+        return self._blocks[pos]

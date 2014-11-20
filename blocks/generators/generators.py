@@ -52,12 +52,6 @@ class Generator(AbstractBlock):
     def _compute_signal(self):
         raise NotImplementedError
 
-    def _invalidate(self):
-        self._is_valid = False
-
-    def _validate(self):
-        self._is_valid = True
-
 
 class OscillatingGenerator(Generator):
     def __init__(self):
