@@ -6,7 +6,7 @@ def freq_to_omega(freq):
 
 
 class DataLoader(object):
-    _instance = None
+    _inst = None
 
     carrier_freq = None
     modulating_freq = None
@@ -15,18 +15,18 @@ class DataLoader(object):
     expected_snr = None
     sampling_freq = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         # singleton pattern
-        if cls._instance is None:
-            cls._instance = super(DataLoader, cls).__new__(cls, *args, **kwargs)
-        return cls._instance
+        if cls._inst is None:
+            cls._inst = super(DataLoader, cls).__new__(cls)
+        return cls._inst
 
     def mock(self):
         self.carrier_freq = 50e6
         self.modulating_freq = 10e6
-        self.freq_deviation = 20e6
-        self.generation_time = 2 / self.modulating_freq
-        self.sampling_freq = 250 * self.carrier_freq
+        self.freq_deviation = 2.41e6
+        self.generation_time = 1 / self.modulating_freq
+        self.sampling_freq = 100 * self.carrier_freq
         self.expected_snr = 15
 
     def load_via_stdin(self):
@@ -62,12 +62,13 @@ class DataLoader(object):
         self.expected_snr = int(input("Expected SNR [dB] = "))
 
     def _validate(self):
-        print(dir(self))
         if self.modulating_freq / self.carrier_freq > MUCH_LOWER:
-            raise BadDataException("Modulating freq should be much lower than carrier.")
+            error = "Modulating freq should be much lower than carrier."
+            raise BadDataException(error)
 
         if self.freq_deviation > self.carrier_freq:
-            raise BadDataException("Frequency deviation should be not bigger than carrier freq.")
+            error = "Frequency deviation should be lower than carrier freq."
+            raise BadDataException(error)
 
 
 MUCH_LOWER = 0.05
@@ -75,5 +76,3 @@ MUCH_LOWER = 0.05
 
 class BadDataException(Exception):
     pass
-
-

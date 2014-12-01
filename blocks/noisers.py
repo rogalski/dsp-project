@@ -1,6 +1,6 @@
 import numpy as np
 
-from blocks.abstract_block import AbstractBlock
+from blocks.meta import AbstractBlock
 
 
 class NoiseMaker(AbstractBlock):
@@ -33,3 +33,7 @@ class NoiseMaker(AbstractBlock):
         length = len(self._input)
         average = np.mean(self._input)
         return np.sum(np.abs(self._input - average) ** 2) / length
+
+    @property
+    def noise(self):
+        return self._noise

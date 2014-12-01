@@ -5,23 +5,28 @@ class AbstractBlock(object):
         self._sampling_frequency = 0
         self._is_valid = False
 
-    def get_input(self):
+    @property
+    def input(self):
         return self._input
 
-    def set_input(self, value):
+    @input.setter
+    def input(self, value):
         if value != self._input:
             self._input = value
             self._invalidate()
 
-    def get_output(self):
+    @property
+    def output(self):
         if not self._is_valid:
             self._process()
         return self._output
 
-    def get_sampling_frequency(self):
+    @property
+    def sampling_frequency(self):
         return self._sampling_frequency
 
-    def set_sampling_frequency(self, value):
+    @sampling_frequency.setter
+    def sampling_frequency(self, value):
         if value != self._sampling_frequency:
             self._sampling_frequency = value
             self._invalidate()
@@ -44,3 +49,8 @@ class AbstractBlock(object):
             return 1 / self._sampling_frequency
         except (TypeError, ZeroDivisionError):
             return 0
+
+
+class NullBlock(AbstractBlock):
+    def _compute(self):
+        self._output = self._input

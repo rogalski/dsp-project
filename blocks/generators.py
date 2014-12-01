@@ -1,6 +1,6 @@
 import numpy as np
 
-from blocks.abstract_block import AbstractBlock
+from blocks.meta import AbstractBlock
 
 
 class Generator(AbstractBlock):
@@ -10,30 +10,43 @@ class Generator(AbstractBlock):
         self._amplitude = 1
         self._offset = 0
 
-    def set_input(self, value):
+    # known issue #30 @ https://bitbucket.org/logilab/pylint/
+    # pylint: disable=arguments-differ
+    @property
+    def input(self):
+        return super(Generator, self).input
+
+    @input.setter
+    def input(self, value):
         err = "Input {} cannot be explicitly set for generator.".format(value)
         raise ValueError(err)
 
-    def get_generation_time(self):
+    @property
+    def generation_time(self):
         return self._generation_time
 
-    def set_generation_time(self, time):
+    @generation_time.setter
+    def generation_time(self, time):
         if time != self._generation_time:
             self._generation_time = time
             self._invalidate()
 
-    def get_amplitude(self):
+    @property
+    def amplitude(self):
         return self._amplitude
 
-    def set_amplitude(self, amplitude):
+    @amplitude.setter
+    def amplitude(self, amplitude):
         if amplitude != self._amplitude:
             self._amplitude = amplitude
             self._invalidate()
 
-    def get_offset(self):
-        return self._amplitude
+    @property
+    def offset(self):
+        return self._offset
 
-    def set_offset(self, offset):
+    @offset.setter
+    def offset(self, offset):
         if offset != self._offset:
             self._offset = offset
             self._invalidate()
@@ -58,10 +71,12 @@ class OscillatingGenerator(Generator):
         super(OscillatingGenerator, self).__init__()
         self._frequency = None
 
-    def get_frequency(self):
+    @property
+    def frequency(self):
         return self._frequency
 
-    def set_frequency(self, frequency):
+    @frequency.setter
+    def frequency(self, frequency):
         if frequency != self._frequency:
             self._frequency = frequency
             self._invalidate()

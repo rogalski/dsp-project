@@ -1,4 +1,4 @@
-PYTHON_FILES=main.py blocks
+PYTHON_FILES=main.py utils.py plots.py blocks
 PROJECT_NAME=rogalski_131385
 
 all: clean prerequisites lint uml

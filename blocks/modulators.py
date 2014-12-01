@@ -1,7 +1,7 @@
 import numpy as np
 
 import utils
-from blocks.abstract_block import AbstractBlock
+from blocks.meta import AbstractBlock
 
 
 class FrequencyModulator(AbstractBlock):

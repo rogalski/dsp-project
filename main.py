@@ -4,21 +4,15 @@ import numpy as np
 import matplotlib
 
 import blocks
-
-import blocks.abstract_block
-import blocks.filters.lowpass
-import blocks.generators
-import blocks.modulators
-import blocks.noisers
-import blocks.system
 import plots
 import utils
+import system
 
 
 class InteractiveRunner(object):
     # pylint: disable=too-few-public-methods
     __INTERACTIVE__ = False
-    plotOutputDir = "output"
+    plotOutputDir = "_output"
 
     def __init__(self):
         self._data_loader = utils.DataLoader()
@@ -44,26 +38,29 @@ class InteractiveRunner(object):
             self._data_loader.mock()
 
     def _build_system(self):
-        self._system = blocks.system.System()
+        self._system = system.System()
         self._build_system_blocks()
-        self._system.set_sampling_frequency(self._data_loader.sampling_freq)
+        self._system.sampling_frequency = self._data_loader.sampling_freq
 
     def _build_system_blocks(self):
         blocks_cascade = [self._make_generator(),
                           self._make_modulator(),
                           self._make_channel(),
-                          self._make_lpf()]
+                          blocks.filters.LowPassFilter(),
+                          blocks.demodulators.FrequencyDemodulator()]
         for block in blocks_cascade:
             self._system.append_block(block)
+
         self._system.GENERATOR = 0
         self._system.MODULATOR = 1
         self._system.CHANNEL = 2
         self._system.LPF = 3
+        self._system.DEMOD = 4
 
     def _make_generator(self):
         generator = blocks.generators.SineGenerator()
-        generator.set_frequency(self._data_loader.modulating_freq)
-        generator.set_generation_time(self._data_loader.generation_time)
+        generator.frequency = self._data_loader.modulating_freq
+        generator.generation_time = self._data_loader.generation_time
         return generator
 
     def _make_modulator(self):
@@ -76,10 +73,6 @@ class InteractiveRunner(object):
         noise_maker = blocks.noisers.NoiseMaker()
         noise_maker.set_expected_snr(self._data_loader.expected_snr)
         return noise_maker
-
-    def _make_lpf(self):
-        lpf = blocks.filters.lowpass.LowPassFilter()
-        return lpf
 
     def _make_plots(self):
         plots.SystemPlotMaker(self._system, self.plotOutputDir).make()

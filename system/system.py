@@ -1,4 +1,4 @@
-from blocks.abstract_block import AbstractBlock
+from blocks.meta import AbstractBlock
 
 
 class System(object):
@@ -10,15 +10,16 @@ class System(object):
         return self._blocks.__iter__()
 
     def __repr__(self):
-        return " ".join((super(System, self).__repr__(), str(self._blocks)))
+        return " ".join((super(System, self).__repr__(),
+                         str(self._blocks)))
 
     def get_blocks(self):
         return self._blocks
 
     def append_block(self, block):
         if not isinstance(block, AbstractBlock):
-            e = "Bad block type. Expected {0}. Found {1}".format(AbstractBlock,
-                                                                 type(block))
+            e = "Bad block. Expected {0}. Found {1}".format(AbstractBlock,
+                                                            type(block))
             raise TypeError(e)
         self._blocks.append(block)
 
@@ -29,23 +30,26 @@ class System(object):
         for index, block in enumerate(self._blocks):
             if index == 0:
                 continue
-            block.set_input(self._blocks[index - 1].get_output())
+            block.input = self._blocks[index - 1].output
 
-    def get_sampling_frequency(self):
+    @property
+    def sampling_frequency(self):
         return self._sampling_frequency
 
-    def set_sampling_frequency(self, freq):
+    @sampling_frequency.setter
+    def sampling_frequency(self, freq):
         self._sampling_frequency = freq
         for block in self._blocks:
             try:
-                block.set_sampling_frequency(freq)
+                block.sampling_frequency = freq
             except AttributeError:
                 pass
 
-    def get_timeline(self):
+    @property
+    def timeline(self):
         if not self._blocks:
             return None
-        return self._blocks[0].get_input()
+        return self._blocks[0].input
 
     def get_block(self, pos):
         return self._blocks[pos]
