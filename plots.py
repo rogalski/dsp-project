@@ -35,8 +35,9 @@ class SystemPlotMaker(object):
         plt.xlabel("Time [s]")
         plt.ylabel("Amplitude [V]")
         plt.subplot(4, 1, 4)
+        plt.title("Modulated signal spectrum")
         self._plot_spectrum(modulator.output)
-        self._save_plt("Inputs")
+        self._save_plt("input")
 
     def _make_noise_plots(self):
         time = self._system.timeline
@@ -47,11 +48,11 @@ class SystemPlotMaker(object):
                  time, channel.input, '-r',
                  time, lpf.output, '-.g')
         plt.legend(["Post-Channel", "Pre-Channel", "After LPF"])
-        self._save_plt("PrePostNoise")
+        self._save_plt("pre_post_noise")
 
-        # plt.figure()
-        # self._plot_spectrum(channel.noise)
-        # self._save_plt("noise_spectrum")
+        plt.figure()
+        self._plot_spectrum(channel.noise)
+        self._save_plt("noise_spectrum")
 
     def _make_demod_plots(self):
         time = self._system.timeline
@@ -72,6 +73,8 @@ class SystemPlotMaker(object):
         yplot = np.fft.fftshift(yf)
         plt.stem(xf, 1.0 / samples_count * np.abs(yplot))
         plt.xlim(0, utils.DataLoader().carrier_freq * 2)
+
+        plt.xlabel("Frequency [Hz]")
 
     def _save_plt(self, filename):
         plt.savefig(os.path.join(self._output_dir, filename))

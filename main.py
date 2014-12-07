@@ -47,8 +47,8 @@ class InteractiveRunner(object):
     def _build_system_blocks(self):
         blocks_cascade = [self._make_generator(),
                           self._make_modulator(),
-                          self._make_noiser(),
                           blocks.channels.MultiPathChannel(),
+                          self._make_noiser(),
                           self._make_low_pass_filter(),
                           self._make_demodulator()]
         for block in blocks_cascade:

@@ -1,7 +1,7 @@
 PYTHON_FILES=main.py utils.py plots.py blocks system
-PROJECT_NAME=rogalski_131385
+PROJECT_NAME=lrogalski
 
-all: clean prerequisites lint uml
+all: clean prerequisites lint
 
 prerequisites:
 	pip install -r requirements.txt

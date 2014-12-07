@@ -8,6 +8,8 @@ def freq_to_omega(freq):
 
 
 class DataLoader(object):
+    MUCH_LOWER = 0.05
+
     _inst = None
 
     carrier_freq = None
@@ -64,16 +66,13 @@ class DataLoader(object):
         self.expected_snr = int(input("Expected SNR [dB] = "))
 
     def _validate(self):
-        if self.modulating_freq / self.carrier_freq > MUCH_LOWER:
+        if self.modulating_freq / self.carrier_freq > self.MUCH_LOWER:
             error = "Modulating freq should be much lower than carrier."
             raise BadDataException(error)
 
         if self.freq_deviation > self.carrier_freq:
             error = "Frequency deviation should be lower than carrier freq."
             raise BadDataException(error)
-
-
-MUCH_LOWER = 0.05
 
 
 class BadDataException(Exception):
