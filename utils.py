@@ -1,5 +1,7 @@
 import numpy as np
 
+from blocks.meta import NullBlock
+
 
 def freq_to_omega(freq):
     return 2 * np.pi * freq
@@ -26,8 +28,8 @@ class DataLoader(object):
         self.modulating_freq = 10e6
         self.freq_deviation = 2.41e6
         self.generation_time = 1 / self.modulating_freq
-        self.sampling_freq = 100 * self.carrier_freq
-        self.expected_snr = 15
+        self.sampling_freq = 64 * self.carrier_freq
+        self.expected_snr = 80
 
     def load_via_stdin(self):
         self._load_data()
@@ -76,3 +78,9 @@ MUCH_LOWER = 0.05
 
 class BadDataException(Exception):
     pass
+
+
+def ignore_block(func):
+    # Decorate maker with it to make NullBlock instead of functional
+    # pylint: disable=unused-argument
+    return lambda *args, **kwargs: NullBlock()

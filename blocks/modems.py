@@ -1,35 +1,72 @@
+import abc
+
 import numpy as np
+import scipy.signal
 
-import utils
 from blocks.meta import AbstractBlock
+import utils
 
 
-class FrequencyModulator(AbstractBlock):
+class FrequencyModem(AbstractBlock):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self):
-        super(FrequencyModulator, self).__init__()
+        super(FrequencyModem, self).__init__()
         self._carrier_frequency = None
         self._frequency_deviation = None
 
-        self._time = None
-        self._carrier = None
-
-    def get_carrier_frequency(self):
+    @property
+    def carrier_frequency(self):
         return self._carrier_frequency
 
-    def set_carrier_frequency(self, freq):
+    @carrier_frequency.setter
+    def carrier_frequency(self, freq):
         if freq != self._carrier_frequency:
             self._carrier_frequency = freq
             self._invalidate()
 
-    def get_frequency_deviation(self):
+    @property
+    def frequency_deviation(self):
         return self._frequency_deviation
 
-    def set_frequency_deviation(self, deviation):
+    @frequency_deviation.setter
+    def frequency_deviation(self, deviation):
         if deviation != self._frequency_deviation:
             self._frequency_deviation = deviation
             self._invalidate()
 
-    def get_carrier(self):
+    @abc.abstractmethod
+    def _compute(self):
+        raise NotImplementedError
+
+
+class FrequencyDemodulator(FrequencyModem):
+    def _compute(self):
+        frequencies = self._compute_instantaneous_frequencies()
+        without_carrier = frequencies - self._carrier_frequency
+        normalized = without_carrier / self._frequency_deviation
+        self._output = normalized
+
+    def _compute_instantaneous_frequencies(self):
+        hilbert = scipy.signal.hilbert(self._input)
+        phase = np.unwrap(np.angle(hilbert))
+        diffs = np.diff(phase) / (2 * np.pi * self._get_time_step())
+        return np.append(diffs, diffs[-1])  # align for samples count
+
+    def __repr__(self):
+        template = "Frequency Demodulator (carrier {0}Hz, deviation {1}Hz)"
+        return template.format(self._carrier_frequency,
+                               self._frequency_deviation)
+
+
+class FrequencyModulator(FrequencyModem):
+    def __init__(self):
+        super(FrequencyModulator, self).__init__()
+        self._time = None
+        self._carrier = None
+
+    @property
+    def carrier(self):
         return self._carrier
 
     def _compute(self):

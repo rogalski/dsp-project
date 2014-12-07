@@ -1,4 +1,9 @@
+import abc
+
+
 class AbstractBlock(object):
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self):
         self._input = None
         self._output = None
@@ -35,6 +40,7 @@ class AbstractBlock(object):
         self._compute()
         self._validate()
 
+    @abc.abstractmethod
     def _compute(self):
         raise NotImplementedError
 

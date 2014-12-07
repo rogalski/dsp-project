@@ -1,7 +1,7 @@
 from blocks.meta import AbstractBlock
 
 
-class System(object):
+class System(object):  # pylint: disable=too-many-instance-attributes
     def __init__(self):
         self._blocks = []
         self._sampling_frequency = 0
@@ -27,10 +27,9 @@ class System(object):
         self._connect_blocks()
 
     def _connect_blocks(self):
-        for index, block in enumerate(self._blocks):
-            if index == 0:
-                continue
-            block.input = self._blocks[index - 1].output
+        for previous_block, next_block in zip(self._blocks[:-1],
+                                              self._blocks[1:]):
+            next_block.input = previous_block.output
 
     @property
     def sampling_frequency(self):

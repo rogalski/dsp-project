@@ -27,7 +27,7 @@ class SystemPlotMaker(object):
         plt.xlabel("Time [s]")
         plt.ylabel("Amplitude [V]")
         plt.subplot(4, 1, 2)
-        plt.plot(time, modulator.get_carrier())
+        plt.plot(time, modulator.carrier)
         plt.xlabel("Time [s]")
         plt.ylabel("Amplitude [V]")
         plt.subplot(4, 1, 3)
@@ -49,18 +49,17 @@ class SystemPlotMaker(object):
         plt.legend(["Post-Channel", "Pre-Channel", "After LPF"])
         self._save_plt("PrePostNoise")
 
-        plt.figure()
-        self._plot_spectrum(channel.noise)
-        self._save_plt("noise_spectrum")
+        # plt.figure()
+        # self._plot_spectrum(channel.noise)
+        # self._save_plt("noise_spectrum")
 
     def _make_demod_plots(self):
         time = self._system.timeline
-        demod = self._system.get_block(self._system.DEMOD)
+        demod = self._system.get_block(self._system.DEMODULATOR)
         mod = self._system.get_block(self._system.MODULATOR)
         plt.figure()
-        plt.plot(time, mod.output,
+        plt.plot(time, mod.input,
                  time, demod.output)
-        print(demod.output)
         plt.legend(["mod", "demod"])
         self._save_plt("demod")
 
