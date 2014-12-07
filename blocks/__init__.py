@@ -1,3 +1,4 @@
+from . import channels
 from . import filters
 from . import generators
 from . import meta

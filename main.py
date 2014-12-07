@@ -47,7 +47,8 @@ class InteractiveRunner(object):
     def _build_system_blocks(self):
         blocks_cascade = [self._make_generator(),
                           self._make_modulator(),
-                          self._make_channel(),
+                          self._make_noiser(),
+                          self._make_multipath_channel(),
                           self._make_low_pass_filter(),
                           self._make_demodulator()]
         for block in blocks_cascade:
@@ -56,9 +57,9 @@ class InteractiveRunner(object):
         # just for sake of readability later
         self._system.GENERATOR = 0
         self._system.MODULATOR = 1
-        self._system.CHANNEL = 2
-        self._system.LPF = 3
-        self._system.DEMODULATOR = 4
+        self._system.CHANNEL = 3
+        self._system.LPF = 4
+        self._system.DEMODULATOR = 5
 
     def _make_generator(self):
         generator = blocks.generators.SineGenerator()
@@ -72,10 +73,13 @@ class InteractiveRunner(object):
         modulator.carrier_frequency = self._data.carrier_freq
         return modulator
 
-    def _make_channel(self):
+    def _make_noiser(self):
         noise_maker = blocks.noisers.Noiser()
         noise_maker.expected_snr = self._data.expected_snr
         return noise_maker
+
+    def _make_multipath_channel(self):
+        return blocks.channels.MultiPathChannel()
 
     def _make_low_pass_filter(self):
         filter_block = blocks.filters.LowPassFilter()
