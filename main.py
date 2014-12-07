@@ -48,7 +48,7 @@ class InteractiveRunner(object):
         blocks_cascade = [self._make_generator(),
                           self._make_modulator(),
                           self._make_noiser(),
-                          self._make_multipath_channel(),
+                          blocks.channels.MultiPathChannel(),
                           self._make_low_pass_filter(),
                           self._make_demodulator()]
         for block in blocks_cascade:
@@ -77,9 +77,6 @@ class InteractiveRunner(object):
         noise_maker = blocks.noisers.Noiser()
         noise_maker.expected_snr = self._data.expected_snr
         return noise_maker
-
-    def _make_multipath_channel(self):
-        return blocks.channels.MultiPathChannel()
 
     def _make_low_pass_filter(self):
         filter_block = blocks.filters.LowPassFilter()
