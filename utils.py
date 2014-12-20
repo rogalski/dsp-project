@@ -28,10 +28,10 @@ class DataLoader(object):
     def mock(self):
         self.carrier_freq = 50e6
         self.modulating_freq = 10e6
-        self.freq_deviation = 2.41e6
-        self.generation_time = 1 / self.modulating_freq
+        self.freq_deviation = 2.41 * self.modulating_freq
+        self.generation_time = 4 / self.modulating_freq
         self.sampling_freq = 64 * self.carrier_freq
-        self.expected_snr = 80
+        self.expected_snr = 25
 
     def load_via_stdin(self):
         self._load_data()
@@ -55,8 +55,8 @@ class DataLoader(object):
         self.freq_deviation = int(input("Freq Deviation [Hz] = "))
 
     def _load_sampling_freq(self):
-        freq = input("Sampling Freq [Hz] (empty = 128*carrier_freq) = ")
-        self.sampling_freq = int(freq) if freq else 128 * self.carrier_freq
+        freq = input("Sampling Freq [Hz] (empty = 64*carrier_freq) = ")
+        self.sampling_freq = int(freq) if freq else 64 * self.carrier_freq
 
     def _load_generation_time(self):
         time = input("Generation Time [s] (default = 4/modulating_freq) = ")

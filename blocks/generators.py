@@ -119,4 +119,4 @@ class SawGenerator(OscillatingGenerator):
         self._output = self._amplitude * saw + self.__offset
 
     def __repr__(self):
-        return "Square Generator ({0}Hz)".format(self._frequency)
+        return "Saw Generator ({0}Hz)".format(self._frequency)

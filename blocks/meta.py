@@ -37,6 +37,7 @@ class AbstractBlock(object):
             self._invalidate()
 
     def _process(self):
+        print("Processing in", self)
         self._compute()
         self._validate()
 

@@ -7,7 +7,7 @@ prerequisites:
 	pip install -r requirements.txt
 
 clean:
-	rm -f *.png *.pyc
+	rm -rf _output __pycache__ *.png *.pyc
 
 uml:
 	pyreverse $(PYTHON_FILES) -o png -p $(PROJECT_NAME) -AS

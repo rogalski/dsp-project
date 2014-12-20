@@ -29,7 +29,6 @@ class InteractiveRunner(object):
 
     def _set_up_packages(self):
         np.set_printoptions(threshold=np.inf)
-        matplotlib.rcParams['axes.formatter.use_mathtext'] = True
         matplotlib.rcParams['axes.formatter.use_locale'] = True
         os.makedirs(self.plotOutputDir, exist_ok=True)
 
