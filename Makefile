@@ -4,7 +4,7 @@ PROJECT_NAME=lrogalski
 all: clean prerequisites lint
 
 prerequisites:
-	pip install -r requirements.txt
+	# pip install -r requirements.txt
 
 clean:
 	rm -rf _output __pycache__ *.png *.pyc
@@ -13,9 +13,9 @@ uml:
 	pyreverse $(PYTHON_FILES) -o png -p $(PROJECT_NAME) -AS
 
 pep8:
-	pep8 $(PYTHON_FILES)
+	python3-pep8 $(PYTHON_FILES)
 
 pylint:
-	pylint $(PYTHON_FILES) --disable=C
+	python3-pylint $(PYTHON_FILES) --disable=C
 
 lint: pep8 pylint

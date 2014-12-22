@@ -1,3 +1,5 @@
+import ast
+
 import numpy as np
 
 from blocks.meta import NullBlock
@@ -8,7 +10,7 @@ def freq_to_omega(freq):
 
 
 class DataLoader(object):
-    MUCH_LOWER = 0.05
+    MUCH_LOWER = 0.5
 
     _inst = None
 
@@ -31,7 +33,7 @@ class DataLoader(object):
         self.freq_deviation = 2.41 * self.modulating_freq
         self.generation_time = 4 / self.modulating_freq
         self.sampling_freq = 64 * self.carrier_freq
-        self.expected_snr = 25
+        self.expected_snr = 15
 
     def load_via_stdin(self):
         self._load_data()
@@ -46,24 +48,34 @@ class DataLoader(object):
         self._load_expected_snr()
 
     def _load_carrier_freq(self):
-        self.carrier_freq = int(input("Carrier Freq [Hz] = "))
+        raw = input("Carrier Freq [Hz] = ")
+        self.carrier_freq = ast.literal_eval(raw)
 
     def _load_modulating_freq(self):
-        self.modulating_freq = int(input("Modulating Freq [Hz] = "))
+        raw = input("Modulating Freq [Hz] = ")
+        self.modulating_freq = ast.literal_eval(raw)
 
     def _load_freq_deviation(self):
-        self.freq_deviation = int(input("Freq Deviation [Hz] = "))
+        raw = input("Freq Deviation [Hz] = ")
+        self.freq_deviation = ast.literal_eval(raw)
 
     def _load_sampling_freq(self):
         freq = input("Sampling Freq [Hz] (empty = 64*carrier_freq) = ")
-        self.sampling_freq = int(freq) if freq else 64 * self.carrier_freq
+        if freq:
+            self.sampling_freq = ast.literal_eval(freq)
+        else:
+            self.sampling_freq = 64 * self.carrier_freq
 
     def _load_generation_time(self):
         time = input("Generation Time [s] (default = 4/modulating_freq) = ")
-        self.generation_time = int(time) if time else 4 / self.modulating_freq
+        if time:
+            self.generation_time = ast.literal_eval(time)
+        else:
+            self.generation_time = 4 / self.modulating_freq
 
     def _load_expected_snr(self):
-        self.expected_snr = int(input("Expected SNR [dB] = "))
+        snr = input("Expected SNR [dB] = ")
+        self.expected_snr = ast.literal_eval(snr)
 
     def _validate(self):
         if self.modulating_freq / self.carrier_freq > self.MUCH_LOWER:

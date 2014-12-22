@@ -13,8 +13,6 @@ class InteractiveRunner(object):
     # pylint: disable=too-few-public-methods
     __INTERACTIVE__ = False
     plotOutputDir = "_output"
-    NO_NOISE = True
-    NO_LPR = True
 
     def __init__(self):
         self._data = utils.DataLoader()
@@ -25,6 +23,7 @@ class InteractiveRunner(object):
         self._load_data()
         self._build_system()
         self._system.simulate()
+        self._report_info()
         self._make_plots()
 
     def _set_up_packages(self):
@@ -88,6 +87,10 @@ class InteractiveRunner(object):
         demodulator.frequency_deviation = self._data.freq_deviation
         demodulator.carrier_frequency = self._data.carrier_freq
         return demodulator
+
+    def _report_info(self):
+        actual_snr = self._system.get_block(self._system.CHANNEL).actual_snr
+        print("Actual SNR: ", actual_snr)
 
     def _make_plots(self):
         plots.SystemPlotMaker(self._system, self.plotOutputDir).make()

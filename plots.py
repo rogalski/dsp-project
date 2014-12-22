@@ -25,20 +25,14 @@ class SystemPlotMaker(object):
         plt.figure(figsize=(8, 12))
         plt.subplot(4, 1, 1)
         plt.plot(time, generator.output)
-        plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude [V]")
         plt.title("Modulating signal")
         self._add_std_figure_formatting('s', 'V')
         plt.subplot(4, 1, 2)
         plt.plot(time, modulator.carrier)
-        plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude [V]")
         plt.title("Carrier")
         self._add_std_figure_formatting('s', 'V')
         plt.subplot(4, 1, 3)
         plt.plot(time, modulator.output)
-        plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude [V]")
         plt.title("Modulated signal")
         self._add_std_figure_formatting('s', 'V')
         plt.subplot(4, 1, 4)
@@ -53,8 +47,8 @@ class SystemPlotMaker(object):
         lpf = self._system.get_block(self._system.LPF)
         plt.figure()
         plt.plot(time, channel.output, ':b',
-                 time, channel.input, '-r',
-                 time, lpf.output, '-.g')
+                 time, channel.input, '-g',
+                 time, lpf.output, '-.r')
         plt.legend(["Post-Channel", "Pre-Channel", "After LPF"])
         self._add_std_figure_formatting('s', 'V')
         self._save_plt("pre_post_noise")
@@ -83,9 +77,7 @@ class SystemPlotMaker(object):
         yplot = np.fft.fftshift(yf)
         plt.stem(xf, 1.0 / samples_count * np.abs(yplot))
         plt.xlim(0, utils.DataLoader().carrier_freq * 2)
-        plt.xlabel("Frequency [Hz]")
         self._add_std_figure_formatting('Hz', 'V')
-        print(np.sum(yplot))
 
     def _add_std_figure_formatting(self, x_unit, y_unit):
         # pylint: disable=no-self-use
@@ -99,4 +91,4 @@ class SystemPlotMaker(object):
         plt.grid('on')
 
     def _save_plt(self, filename):
-        plt.savefig(os.path.join(self._output_dir, filename))
+        plt.savefig(os.path.join(self._output_dir, filename + '.svg'))
