@@ -28,7 +28,8 @@ class InteractiveRunner(object):
 
     def _set_up_packages(self):
         np.set_printoptions(threshold=np.inf)
-        matplotlib.rcParams['axes.formatter.use_locale'] = True
+        matplotlib.rc('font', family='DejaVu Sans', size='10')
+        matplotlib.rc('legend', fontsize=10)
         os.makedirs(self.plotOutputDir, exist_ok=True)
 
     def _load_data(self):

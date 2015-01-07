@@ -16,7 +16,7 @@ class LowPassFilter(AbstractBlock):
         self._output = signal.filtfilt(self._b, self._a, self._input)
 
     def _compute_filter_coefficients(self):
-        filter_order = 8
+        filter_order = 4
         cutoff_omega = self._get_normalized_cutoff_omega()
         print("Filter cutoff omega", cutoff_omega)
         coefficients = signal.butter(filter_order, cutoff_omega,

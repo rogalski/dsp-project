@@ -13,7 +13,7 @@ uml:
 	pyreverse $(PYTHON_FILES) -o png -p $(PROJECT_NAME) -AS
 
 pep8:
-	python3-pep8 $(PYTHON_FILES)
+	python3-pep8 $(PYTHON_FILES) --max-line-length=119
 
 pylint:
 	python3-pylint $(PYTHON_FILES) --disable=C
