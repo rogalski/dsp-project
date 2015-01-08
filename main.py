@@ -79,7 +79,7 @@ class InteractiveRunner(object):
 
     def _make_low_pass_filter(self):
         filter_block = blocks.filters.LowPassFilter()
-        cutoff_freq = self._data.carrier_freq + self._data.freq_deviation
+        cutoff_freq = 150e6
         filter_block.cutoff_frequency = cutoff_freq
         return filter_block
 

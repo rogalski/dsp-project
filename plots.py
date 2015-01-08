@@ -84,7 +84,7 @@ class SystemPlotMaker(object):
         response = scipy.signal.lfilter(b, a, impulse)
 
         w, h = scipy.signal.freqz(*filt.coefficients)
-        f = w / np.pi * fs
+        f = w / np.max(w) * fs
         plt.figure()
         plt.subplot(2, 1, 1)
         plt.stem(response)
@@ -95,8 +95,16 @@ class SystemPlotMaker(object):
         plt.plot(f, 20 * np.log10(np.abs(h)))
         plt.title("Wykres 9. Odpowiedź częstotliwościowa użytego filtru Butterwortha")
         self._add_std_figure_formatting("Hz", "dB")
-        plt.ylim((-80, 1))
+        plt.ylim((-30, 1))
+        plt.xlim(0, utils.DataLoader().carrier_freq * 6)
         self._save_plt("filter")
+
+        plt.figure()
+        self._plot_spectrum(filt.output)
+        plt.xlim(0, utils.DataLoader().carrier_freq * 6)
+        self._save_plt("filtered_spectrum")
+        plt.title("Wykres 10. Widmo sygnału po filtracji w odbiorniku")
+        self._save_plt("filtered_spectrum")
 
     def _make_error_plots(self):
         plt.figure()
@@ -106,7 +114,7 @@ class SystemPlotMaker(object):
         error = demod.output - mod.input
         plt.plot(time, error)
         self._add_std_figure_formatting('s', 'V')
-        plt.title("Wykres 10. Wykres błędu demodulacji")
+        plt.title("Wykres 11. Wykres błędu demodulacji")
         self._save_plt("error")
 
     def _plot_spectrum(self, signal):
@@ -119,7 +127,7 @@ class SystemPlotMaker(object):
         yplot = 1.0 / samples_count * np.fft.fftshift(yf)
         plt.plot(xf, 20 * np.log10(np.abs(yplot)))
         plt.xlim(0, utils.DataLoader().carrier_freq * 2)
-        self._add_std_figure_formatting('Hz', 'dBV')
+        self._add_std_figure_formatting('Hz', 'dB')
         plt.ylim((yLimit, 0))
 
     def _add_std_figure_formatting(self, x_unit, y_unit):

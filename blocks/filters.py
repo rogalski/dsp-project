@@ -1,4 +1,3 @@
-import numpy as np
 import scipy.signal as signal
 
 from blocks.meta import AbstractBlock
@@ -16,7 +15,7 @@ class LowPassFilter(AbstractBlock):
         self._output = signal.filtfilt(self._b, self._a, self._input)
 
     def _compute_filter_coefficients(self):
-        filter_order = 4
+        filter_order = 8
         cutoff_omega = self._get_normalized_cutoff_omega()
         print("Filter cutoff omega", cutoff_omega)
         coefficients = signal.butter(filter_order, cutoff_omega,
@@ -40,4 +39,4 @@ class LowPassFilter(AbstractBlock):
         return self._b, self._a
 
     def _get_normalized_cutoff_omega(self):
-        return np.pi * self._cutoff_frequency / self._sampling_frequency
+        return self._cutoff_frequency / self._sampling_frequency
