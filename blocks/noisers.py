@@ -39,15 +39,26 @@ class BandNoiser(AbstractBlock):
             self._invalidate()
 
     def _compute(self):
+        self._compute_base_noise()
+        self._limit_noise_bandwidth()
+        self._rescale_noise()
+        self._output = self._input + self._noise
+
+    def _compute_base_noise(self):
         var = self._get_input_variance()
         sigma = np.sqrt(var) * (10 ** (-self._expected_snr / 20))
         self._noise = sigma * np.random.randn(self._input.size)
+
+    def _limit_noise_bandwidth(self):
+        if not self.freqs:
+            return
         omegas = self._get_normalized_cutoff_omegas()
         b, a = signal.butter(4, omegas, btype='bandpass')
         self._noise = signal.lfilter(b, a, self._noise)
+
+    def _rescale_noise(self):
         snr_difference = self.actual_snr - self.expected_snr
         self._noise *= 10 ** (snr_difference / 20)
-        self._output = self._input + self._noise
 
     def _get_input_variance(self):
         length = self._input.size
