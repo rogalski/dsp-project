@@ -1,13 +1,15 @@
 import numpy as np
+from scipy import signal
 
 from blocks.meta import AbstractBlock
 
 
-class Noiser(AbstractBlock):
+class BandNoiser(AbstractBlock):
     def __init__(self):
-        super(Noiser, self).__init__()
+        super(BandNoiser, self).__init__()
         self._expected_snr = 20
         self._noise = None
+        self._freqs = None
 
     @property
     def actual_snr(self):
@@ -26,10 +28,25 @@ class Noiser(AbstractBlock):
             self._expected_snr = snr
             self._invalidate()
 
+    @property
+    def freqs(self):
+        return self._freqs
+
+    @freqs.setter
+    def freqs(self, freqs):
+        if freqs != self._freqs:
+            self._freqs = freqs
+            self._invalidate()
+
     def _compute(self):
         var = self._get_input_variance()
         sigma = np.sqrt(var) * (10 ** (-self._expected_snr / 20))
         self._noise = sigma * np.random.randn(self._input.size)
+        omegas = self._get_normalized_cutoff_omegas()
+        b, a = signal.butter(4, omegas, btype='bandpass')
+        self._noise = signal.lfilter(b, a, self._noise)
+        snr_difference = self.actual_snr - self.expected_snr
+        self._noise *= 10 ** (snr_difference / 20)
         self._output = self._input + self._noise
 
     def _get_input_variance(self):
@@ -40,3 +57,7 @@ class Noiser(AbstractBlock):
     @property
     def noise(self):
         return self._noise
+
+    def _get_normalized_cutoff_omegas(self):
+        return [2 * f / self._sampling_frequency
+                for f in self._freqs]

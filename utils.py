@@ -28,12 +28,12 @@ class DataLoader(object):
         return cls._inst
 
     def mock(self):
-        self.carrier_freq = 50e6
-        self.modulating_freq = 10e6
-        self.freq_deviation = 2.41 * self.modulating_freq
-        self.generation_time = 4 / self.modulating_freq
-        self.sampling_freq = 64 * self.carrier_freq
-        self.expected_snr = 15
+        self.carrier_freq = 100e6
+        self.modulating_freq = 5e6
+        self.freq_deviation = 1 * self.modulating_freq
+        self.generation_time = 50 / self.modulating_freq
+        self.sampling_freq = 32 * self.carrier_freq
+        self.expected_snr = 20
 
     def load_via_stdin(self):
         self._load_data()

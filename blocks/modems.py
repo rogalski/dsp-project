@@ -87,6 +87,7 @@ class FrequencyModulator(FrequencyModem):
         omega_dev = utils.freq_to_omega(self._frequency_deviation)
         ph = np.cumsum(self._get_normalized_input()) / self._sampling_frequency
         self._output = np.sin(omega * self._time + omega_dev * ph)
+        self._output = self._output / np.max(np.abs(self._output))
 
     def _get_normalized_input(self):
         return self._input / np.max(np.abs(self._input))

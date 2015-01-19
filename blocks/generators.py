@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import signal
 
 from blocks.meta import AbstractBlock
 
@@ -120,3 +121,34 @@ class SawGenerator(OscillatingGenerator):
 
     def __repr__(self):
         return "Saw Generator ({0}Hz)".format(self._frequency)
+
+
+class NoiseGenerator(Generator):
+    def _compute_signal(self):
+        self._output = np.random.normal(size=self._input.size)
+
+
+class BandNoiseGenerator(NoiseGenerator):
+    def __init__(self):
+        super(BandNoiseGenerator, self).__init__()
+        self._bandwidth = 0.01
+
+    @property
+    def bandwidth(self):
+        return self._bandwidth
+
+    @bandwidth.setter
+    def bandwidth(self, bandwidth):
+        if bandwidth != self._bandwidth:
+            self._bandwidth = bandwidth
+            self._invalidate()
+
+    def _compute_signal(self):
+        super(BandNoiseGenerator, self)._compute_signal()
+        print("_get_normalized_bw: ", self._get_normalized_bw())
+        b, a = signal.butter(4, self._get_normalized_bw(), btype='low', analog=False)
+        self._output = signal.lfilter(b, a, self._output)
+        self._output = self._output / np.max(np.abs(self._output))
+
+    def _get_normalized_bw(self):
+        return self._bandwidth / self._sampling_frequency

@@ -3,10 +3,10 @@ import scipy.signal as signal
 from blocks.meta import AbstractBlock
 
 
-class LowPassFilter(AbstractBlock):
+class BandPassFilter(AbstractBlock):
     def __init__(self):
-        super(LowPassFilter, self).__init__()
-        self._cutoff_frequency = None
+        super(BandPassFilter, self).__init__()
+        self._freqs = None
         self._b = None
         self._a = None
 
@@ -15,28 +15,29 @@ class LowPassFilter(AbstractBlock):
         self._output = signal.filtfilt(self._b, self._a, self._input)
 
     def _compute_filter_coefficients(self):
-        filter_order = 8
-        cutoff_omega = self._get_normalized_cutoff_omega()
-        print("Filter cutoff omega", cutoff_omega)
-        coefficients = signal.butter(filter_order, cutoff_omega,
-                                     output='ba', btype='low',
+        filter_order = 4
+        cutoff_omegas = self._get_normalized_cutoff_omegas()
+        print("Filter cutoff omegas", cutoff_omegas)
+        coefficients = signal.butter(filter_order, cutoff_omegas,
+                                     output='ba', btype='bandpass',
                                      analog=False)
         self._b = coefficients[0]
         self._a = coefficients[1]
 
     @property
-    def cutoff_frequency(self):
-        return self._cutoff_frequency
+    def freqs(self):
+        return self._freqs
 
-    @cutoff_frequency.setter
-    def cutoff_frequency(self, freq):
-        if freq != self._cutoff_frequency:
-            self._cutoff_frequency = freq
+    @freqs.setter
+    def freqs(self, freqs):
+        if freqs != self._freqs:
+            self._freqs = freqs
             self._invalidate()
 
     @property
     def coefficients(self):
         return self._b, self._a
 
-    def _get_normalized_cutoff_omega(self):
-        return self._cutoff_frequency / self._sampling_frequency
+    def _get_normalized_cutoff_omegas(self):
+        return [2 * f / self._sampling_frequency
+                for f in self._freqs]
